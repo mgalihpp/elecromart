@@ -1,5 +1,5 @@
-import { Router } from 'express';
-import { productRouter } from './product.routes';
+import { Router } from "express";
+import { productRouter } from "./product.routes";
 
 /**
  * Router utama untuk versi 1 (v1) dari API.
@@ -24,6 +24,6 @@ const v1Router: Router = Router();
  * Semua route yang berhubungan dengan data produk, managemen produk.
  * pengguna dikelola di dalam router ini.
  */
-v1Router.use('/product', productRouter);
+v1Router.use("/product", productRouter);
 
 export default v1Router;

@@ -1,7 +1,7 @@
-import { Card, CardContent } from '@repo/ui/components/card';
-import Image from 'next/image';
-import Link from 'next/link';
-import ForgotPasswordForm from '@/components/auth/forgot-password-form';
+import { Card, CardContent } from "@repo/ui/components/card";
+import Image from "next/image";
+import Link from "next/link";
+import ForgotPasswordForm from "@/components/auth/forgot-password-form";
 
 export default function ForgotPasswordPage() {
   return (
@@ -112,7 +112,7 @@ export default function ForgotPasswordPage() {
                     </Link>
                   </div>
                   <div className="text-muted-foreground">
-                    Don't have an account?{' '}
+                    Don't have an account?{" "}
                     <Link
                       href="/register"
                       className="text-primary hover:underline font-medium"

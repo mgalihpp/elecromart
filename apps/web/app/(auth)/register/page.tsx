@@ -4,11 +4,11 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@repo/ui/components/card';
-import Image from 'next/image';
-import Link from 'next/link';
-import RegisterForm from '@/components/auth/register-form';
-import SocialLoginButtons from '@/components/auth/social-login-buttons';
+} from "@repo/ui/components/card";
+import Image from "next/image";
+import Link from "next/link";
+import RegisterForm from "@/components/auth/register-form";
+import SocialLoginButtons from "@/components/auth/social-login-buttons";
 
 export default function RegisterPage() {
   return (
@@ -145,7 +145,7 @@ export default function RegisterPage() {
 
                 {/* Footer Links */}
                 <div className="text-center text-sm text-muted-foreground">
-                  Already have an account?{' '}
+                  Already have an account?{" "}
                   <Link
                     href="/login"
                     className="text-primary hover:underline font-medium"
@@ -156,11 +156,11 @@ export default function RegisterPage() {
 
                 {/* Terms */}
                 <p className="text-xs text-muted-foreground text-center">
-                  By signing up, you agree to our{' '}
+                  By signing up, you agree to our{" "}
                   <Link href="#" className="text-primary hover:underline">
                     Terms of Service
-                  </Link>{' '}
-                  and{' '}
+                  </Link>{" "}
+                  and{" "}
                   <Link href="#" className="text-primary hover:underline">
                     Privacy Policy
                   </Link>

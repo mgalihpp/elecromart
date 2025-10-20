@@ -1,34 +1,34 @@
-'use client';
+"use client";
 
-import { Alert, AlertDescription } from '@repo/ui/components/alert';
-import { Button } from '@repo/ui/components/button';
-import { Input } from '@repo/ui/components/input';
-import { getBaseUrl } from '@repo/ui/lib/utils';
-import { AlertCircle, CheckCircle2, Loader2, Mail } from 'lucide-react';
-import type React from 'react';
-import { useState } from 'react';
-import { authClient } from '@/lib/auth-client';
+import { Alert, AlertDescription } from "@repo/ui/components/alert";
+import { Button } from "@repo/ui/components/button";
+import { Input } from "@repo/ui/components/input";
+import { getBaseUrl } from "@repo/ui/lib/utils";
+import { AlertCircle, CheckCircle2, Loader2, Mail } from "lucide-react";
+import type React from "react";
+import { useState } from "react";
+import { authClient } from "@/lib/auth-client";
 
 export default function ForgotPasswordForm() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setIsLoading(true);
 
     // Validation
     if (!email) {
-      setError('Please enter your email address');
+      setError("Please enter your email address");
       setIsLoading(false);
       return;
     }
 
-    if (!email.includes('@')) {
-      setError('Please enter a valid email address');
+    if (!email.includes("@")) {
+      setError("Please enter a valid email address");
       setIsLoading(false);
       return;
     }
@@ -69,7 +69,7 @@ export default function ForgotPasswordForm() {
             Check Your Email
           </h3>
           <p className="text-sm text-muted-foreground">
-            We've sent a password reset link to{' '}
+            We've sent a password reset link to{" "}
             <span className="font-medium text-foreground">{email}</span>
           </p>
         </div>
@@ -82,7 +82,7 @@ export default function ForgotPasswordForm() {
           className="w-full bg-transparent"
           onClick={() => {
             setSuccess(false);
-            setEmail('');
+            setEmail("");
           }}
         >
           Try Another Email
@@ -131,7 +131,7 @@ export default function ForgotPasswordForm() {
             Sending...
           </>
         ) : (
-          'Send Reset Link'
+          "Send Reset Link"
         )}
       </Button>
     </form>

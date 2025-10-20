@@ -4,11 +4,11 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@repo/ui/components/card';
-import Image from 'next/image';
-import Link from 'next/link';
-import LoginForm from '@/components/auth/login-form';
-import SocialLoginButtons from '@/components/auth/social-login-buttons';
+} from "@repo/ui/components/card";
+import Image from "next/image";
+import Link from "next/link";
+import LoginForm from "@/components/auth/login-form";
+import SocialLoginButtons from "@/components/auth/social-login-buttons";
 
 export default function LoginPage() {
   return (
@@ -144,7 +144,7 @@ export default function LoginPage() {
                 {/* Footer Links */}
                 <div className="space-y-3 text-sm">
                   <div className="text-center text-muted-foreground">
-                    Don't have an account?{' '}
+                    Don't have an account?{" "}
                     <Link
                       href="/register"
                       className="text-primary hover:underline font-medium"

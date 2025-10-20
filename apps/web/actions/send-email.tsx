@@ -1,24 +1,24 @@
-'use server';
+"use server";
 
-import { getBaseUrl } from '@repo/ui/lib/utils';
+import { getBaseUrl } from "@repo/ui/lib/utils";
 
 type SendEmailParams = {
   to: string;
   subject: string;
   text: string;
-  type: 'reset-password' | 'verify-email';
+  type: "reset-password" | "verify-email";
 };
 
 export const sendEmail = async ({
   to,
   subject,
   text,
-  type = 'verify-email',
+  type = "verify-email",
 }: SendEmailParams) => {
   const response = await fetch(`${getBaseUrl()}/api/send`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({ to, subject, text, type }),
   });
