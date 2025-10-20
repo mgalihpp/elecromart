@@ -1,7 +1,7 @@
-import { Card, CardContent } from "@repo/ui/components/card";
-import Image from "next/image";
-import Link from "next/link";
-import ForgotPasswordForm from "@/components/auth/forgot-password-form";
+import { Card, CardContent } from '@repo/ui/components/card';
+import Image from 'next/image';
+import Link from 'next/link';
+import ForgotPasswordForm from '@/components/auth/forgot-password-form';
 
 export default function ForgotPasswordPage() {
   return (
@@ -21,7 +21,7 @@ export default function ForgotPasswordPage() {
           {/* Hero Image */}
           <div className="relative z-10 flex-1 flex items-center justify-center">
             <Image
-              src="/security-lock-and-key-illustration.jpg"
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/attachments/gen-images/public/security-lock-and-key-illustration-o84EU3SVuMPOFDsdLRci6OhfXK07vr.jpg"
               alt="Security illustration"
               width={400}
               height={400}
@@ -112,7 +112,7 @@ export default function ForgotPasswordPage() {
                     </Link>
                   </div>
                   <div className="text-muted-foreground">
-                    Don't have an account?{" "}
+                    Don't have an account?{' '}
                     <Link
                       href="/register"
                       className="text-primary hover:underline font-medium"

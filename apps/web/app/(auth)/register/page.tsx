@@ -4,11 +4,11 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@repo/ui/components/card";
-import Image from "next/image";
-import Link from "next/link";
-import RegisterForm from "@/components/auth/register-form";
-import SocialLoginButtons from "@/components/auth/social-login-buttons";
+} from '@repo/ui/components/card';
+import Image from 'next/image';
+import Link from 'next/link';
+import RegisterForm from '@/components/auth/register-form';
+import SocialLoginButtons from '@/components/auth/social-login-buttons';
 
 export default function RegisterPage() {
   return (
@@ -28,7 +28,7 @@ export default function RegisterPage() {
           {/* Hero Image */}
           <div className="relative z-10 flex-1 flex items-center justify-center">
             <Image
-              src="/happy-customer-shopping-online.jpg"
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/attachments/gen-images/public/happy-customer-shopping-online-ApOyQs4uFGVoCg0URIUcde2fkcX0RE.jpg"
               alt="Happy customer illustration"
               width={400}
               height={400}
@@ -112,7 +112,7 @@ export default function RegisterPage() {
                 Create Account
               </h1>
               <p className="text-muted-foreground">
-                Join ShopHub and start shopping today
+                Join ElecroMart and start shopping today
               </p>
             </div>
 
@@ -145,7 +145,7 @@ export default function RegisterPage() {
 
                 {/* Footer Links */}
                 <div className="text-center text-sm text-muted-foreground">
-                  Already have an account?{" "}
+                  Already have an account?{' '}
                   <Link
                     href="/login"
                     className="text-primary hover:underline font-medium"
@@ -156,11 +156,11 @@ export default function RegisterPage() {
 
                 {/* Terms */}
                 <p className="text-xs text-muted-foreground text-center">
-                  By signing up, you agree to our{" "}
+                  By signing up, you agree to our{' '}
                   <Link href="#" className="text-primary hover:underline">
                     Terms of Service
-                  </Link>{" "}
-                  and{" "}
+                  </Link>{' '}
+                  and{' '}
                   <Link href="#" className="text-primary hover:underline">
                     Privacy Policy
                   </Link>

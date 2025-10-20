@@ -1,34 +1,34 @@
-"use client";
+'use client';
 
-import { Alert, AlertDescription } from "@repo/ui/components/alert";
-import { Button } from "@repo/ui/components/button";
-import { Input } from "@repo/ui/components/input";
-import { getBaseUrl } from "@repo/ui/lib/utils";
-import { AlertCircle, CheckCircle2, Loader2, Mail } from "lucide-react";
-import type React from "react";
-import { useState } from "react";
-import { authClient } from "@/lib/auth-client";
+import { Alert, AlertDescription } from '@repo/ui/components/alert';
+import { Button } from '@repo/ui/components/button';
+import { Input } from '@repo/ui/components/input';
+import { getBaseUrl } from '@repo/ui/lib/utils';
+import { AlertCircle, CheckCircle2, Loader2, Mail } from 'lucide-react';
+import type React from 'react';
+import { useState } from 'react';
+import { authClient } from '@/lib/auth-client';
 
 export default function ForgotPasswordForm() {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError('');
     setIsLoading(true);
 
     // Validation
     if (!email) {
-      setError("Please enter your email address");
+      setError('Please enter your email address');
       setIsLoading(false);
       return;
     }
 
-    if (!email.includes("@")) {
-      setError("Please enter a valid email address");
+    if (!email.includes('@')) {
+      setError('Please enter a valid email address');
       setIsLoading(false);
       return;
     }
@@ -59,18 +59,6 @@ export default function ForgotPasswordForm() {
   if (success) {
     return (
       <div className="space-y-4 text-center">
-        {/* Help Section */}
-        <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-lg text-start">
-          <h3 className="font-semibold text-amber-900 dark:text-amber-200 mb-2 text-sm">
-            Didn't receive an email?
-          </h3>
-          <ul className="text-sm text-amber-800 dark:text-amber-300 space-y-1">
-            <li>• Check your spam or junk folder</li>
-            <li>• Make sure you entered the correct email address</li>
-            <li>• Try again in a few minutes</li>
-          </ul>
-        </div>
-
         <div className="flex justify-center">
           <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
             <CheckCircle2 className="w-8 h-8 text-green-600 dark:text-green-400" />
@@ -81,7 +69,7 @@ export default function ForgotPasswordForm() {
             Check Your Email
           </h3>
           <p className="text-sm text-muted-foreground">
-            We've sent a password reset link to{" "}
+            We've sent a password reset link to{' '}
             <span className="font-medium text-foreground">{email}</span>
           </p>
         </div>
@@ -94,7 +82,7 @@ export default function ForgotPasswordForm() {
           className="w-full bg-transparent"
           onClick={() => {
             setSuccess(false);
-            setEmail("");
+            setEmail('');
           }}
         >
           Try Another Email
@@ -143,7 +131,7 @@ export default function ForgotPasswordForm() {
             Sending...
           </>
         ) : (
-          "Send Reset Link"
+          'Send Reset Link'
         )}
       </Button>
     </form>

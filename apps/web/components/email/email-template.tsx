@@ -2,9 +2,10 @@ import * as React from 'react';
 
 interface EmailTemplateProps {
   url: string;
+  type: 'reset-password' | 'verify-email';
 }
 
-export function EmailTemplate({ url }: EmailTemplateProps) {
+export function EmailTemplate({ url, type }: EmailTemplateProps) {
   return (
     <div
       style={{
@@ -18,10 +19,13 @@ export function EmailTemplate({ url }: EmailTemplateProps) {
         boxShadow: '0 2px 6px rgba(16,24,40,0.05)',
       }}
     >
-      <h1 style={{ margin: '0 0 12px', fontSize: 20 }}>Verify your email</h1>
+      <h1 style={{ margin: '0 0 12px', fontSize: 20 }}>
+        {type === 'verify-email' ? 'Verify your email' : 'Reset Password'}
+      </h1>
       <p style={{ margin: '0 0 20px', lineHeight: 1.5 }}>
-        Thanks for creating an account. Please verify your email address by
-        clicking the button below.
+        {type === 'verify-email'
+          ? 'Thanks for creating an account. Please verify your email address by clicking the button below.'
+          : 'You requested a password reset. Click the button below to choose a new password.'}
       </p>
 
       <div style={{ textAlign: 'center', margin: '20px 0' }}>
@@ -39,7 +43,7 @@ export function EmailTemplate({ url }: EmailTemplateProps) {
             fontWeight: 600,
           }}
         >
-          Verify Email
+          {type === 'verify-email' ? 'Verify Email' : 'Reset Password'}
         </a>
       </div>
 
