@@ -4,16 +4,20 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
-    "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types"
+    "check-types": "turbo run check-types",
+    "format-and-lint": "biome check .",
+    "format-and-lint:fix": "biome check . --write"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.2.6",
+    "@types/node": "^22.15.3",
     "prettier": "^3.6.2",
+    "root": "3.2.0",
     "turbo": "^2.5.8",
-    "typescript": "5.9.2"
+    "typescript": "catalog:"
   },
-  "packageManager": "pnpm@9.0.0",
+  "packageManager": "pnpm@10.18.3",
   "engines": {
     "node": ">=18"
   }
