@@ -21,15 +21,15 @@ export default function LoginPage() {
 
           {/* Logo/Brand */}
           <div className="relative z-10">
-            <h2 className="text-3xl font-bold text-white mb-2">ElecroMart</h2>
+            <h2 className="text-3xl font-bold text-white mb-2">TryWear</h2>
             <p className="text-blue-100">Your trusted e-commerce platform</p>
           </div>
 
           {/* Hero Image */}
           <div className="relative z-10 flex-1 flex items-center justify-center">
             <Image
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/attachments/gen-images/public/shopping-bags-and-products-tX9EZbiWTfTtXRmkLAzUrD4dufzWmi.jpg"
-              alt="Shopping illustration"
+              src="/image/hero-login.jpg"
+              alt=""
               width={400}
               height={400}
               className="drop-shadow-lg"
@@ -110,7 +110,7 @@ export default function LoginPage() {
                 Welcome Back
               </h1>
               <p className="text-muted-foreground">
-                Sign in to your ElecroMart account
+                Sign in to your TryWear account
               </p>
             </div>
 

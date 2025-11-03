@@ -10,7 +10,7 @@ export async function POST(req: NextRequest, _res: NextResponse) {
 
   try {
     const { data, error } = await resend.emails.send({
-      from: "Elecromart <onboarding@resend.dev>",
+      from: "TryWear <onboarding@resend.dev>",
       to,
       subject,
       react: EmailTemplate({ url: text, type }),

@@ -1,0 +1,40 @@
+/* Admin Dashboard Styles */
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--color-background));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--color-border));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--color-muted-foreground));
+}
+
+/* Table hover effects */
+table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+/* Smooth transitions */
+* {
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+/* Focus states */
+input:focus,
+select:focus,
+button:focus {
+  outline: 2px solid hsl(var(--color-ring));
+  outline-offset: 2px;
+}

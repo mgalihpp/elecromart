@@ -4,7 +4,8 @@
     "paths": {
       "@/*": ["./*"],
       "@repo/ui/*": ["../../packages/ui/src/*"],
-      "@repo/db/*": ["../../packages/db/src/*"]
+      "@repo/db/*": ["../../packages/db/src/*"],
+      "@repo/schema": ["../../packages/schema/src/*"]
     },
     "plugins": [
       {

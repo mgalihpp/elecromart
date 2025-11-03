@@ -9,8 +9,10 @@
     "source.fixAll.biome": "explicit"
   },
   "chat.mcp.serverSampling": {
-    "elecromart/.vscode/mcp.json: Better Auth": {
-      "allowedModels": ["copilot/gpt-5-mini"]
+    "TryWear/.vscode/mcp.json: Better Auth": {
+      "allowedModels": [
+        "copilot/gpt-5-mini"
+      ]
     }
   }
 }
