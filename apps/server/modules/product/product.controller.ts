@@ -1,6 +1,8 @@
 import type { Prisma, Product } from "@repo/db";
 import {
+  createProductImagesSchema,
   createProductSchema,
+  imageIdParams,
   listProductsQuery,
   productIdParams,
   updateProductSchema,
@@ -54,7 +56,7 @@ export class ProductController extends BaseController<Product, ProductService> {
       take: limit,
     });
 
-    new AppResponse({
+    return new AppResponse({
       res,
       data: products,
     });
@@ -64,7 +66,7 @@ export class ProductController extends BaseController<Product, ProductService> {
     const { id } = productIdParams.parse(req.params);
     const product = await this.service.findById(id);
 
-    new AppResponse({
+    return new AppResponse({
       res,
       data: product,
     });
@@ -74,9 +76,20 @@ export class ProductController extends BaseController<Product, ProductService> {
     const data = createProductSchema.parse(req.body);
     const newProduct = await this.service.create(data);
 
-    new AppResponse({
+    return new AppResponse({
       res,
       data: newProduct,
+    });
+  });
+
+  createImages = asyncHandler(async (req: Request, res: Response) => {
+    const data = createProductImagesSchema.parse(req.body);
+
+    const images = await this.service.createImages(data);
+
+    return new AppResponse({
+      res,
+      data: images,
     });
   });
 
@@ -86,9 +99,19 @@ export class ProductController extends BaseController<Product, ProductService> {
 
     const updatedProduct = await this.service.update(id, data);
 
-    new AppResponse({
+    return new AppResponse({
       res,
       data: updatedProduct,
+    });
+  });
+
+  deleteImage = asyncHandler(async (req: Request, res: Response) => {
+    const { imageId } = imageIdParams.parse(req.params);
+    const deletedImage = await this.service.deleteImage(Number(imageId));
+
+    return new AppResponse({
+      res,
+      data: deletedImage,
     });
   });
 }

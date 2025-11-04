@@ -1,5 +1,6 @@
 import type { Prisma, Product } from "@repo/db";
 import type {
+  CreateProductImagesInput,
   CreateProductInput,
   CreateVariantInput,
   UpdateProductInput,
@@ -48,6 +49,12 @@ export const productApi = {
     return data;
   },
 
+  createImages: async (input: CreateProductImagesInput) => {
+    const res = await axios.post("/products/images", input);
+    const { data } = res.data;
+    return data;
+  },
+
   update: async (productId: string, input: UpdateProductInput) => {
     const res = await axios.put<ApiResponse<Product>>(
       `/products/${productId}`,
@@ -65,6 +72,12 @@ export const productApi = {
 
   deleteVariant: async (variantId: string) => {
     const res = await axios.delete(`/products/variant/${variantId}`);
+    const { data } = res.data;
+    return data;
+  },
+
+  deleteImage: async (imageId: number) => {
+    const res = await axios.delete(`/products/images/${imageId}`);
     const { data } = res.data;
     return data;
   },

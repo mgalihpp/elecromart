@@ -30,7 +30,9 @@ export default function AdminLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} overflow-hidden`}
+      >
         <ReactQueryProvider>
           <div className="flex h-screen bg-background">
             <SidebarProvider>

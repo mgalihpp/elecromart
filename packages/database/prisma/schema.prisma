@@ -164,6 +164,7 @@ model ProductImages {
   url        String  @db.Text
   alt        String? @db.Text
   sort_order Int     @default(0)
+  key        String  @db.Text
   product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
 }
 

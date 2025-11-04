@@ -28,14 +28,16 @@ import {
 } from "@repo/ui/components/select";
 import { Textarea } from "@repo/ui/components/textarea";
 import { useMutation } from "@tanstack/react-query";
-import { Plus, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
 import { formatCurrency } from "@/features/admin/utils";
+import { useProductMediaUpload } from "@/features/upload/hooks/useProductMediaUpload";
 import { api } from "@/lib/api";
+import { CategoryCombobox } from "../_components/category-combobox";
 import { ProductImageUpload } from "../_components/product-image-upload";
 import { ProductVariantsSection } from "../_components/product-variant-sections";
 
@@ -52,38 +54,11 @@ export default function CreateProductPage() {
     },
   });
 
-  const [productImages, setProductImages] = useState([]);
-  const [imageInput, setImageInput] = useState("");
   const [variantOptions, setVariantOptions] = useState<VariantOption[]>([]);
   const [variantCombinations, setVariantCombinations] = useState<
     VariantCombination[]
   >([]);
-
-  // const handleChange = (
-  //   e: React.ChangeEvent<
-  //     HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-  //   >
-  // ) => {
-  //   const { name, value } = e.target;
-  //   setFormData((prev) => ({ ...prev, [name]: value }));
-  // };
-
-  // const addImage = () => {
-  //   if (imageInput.trim()) {
-  //     setFormData((prev) => ({
-  //       ...prev,
-  //       images: [...prev.images, imageInput],
-  //     }));
-  //     setImageInput("");
-  //   }
-  // };
-
-  // const removeImage = (index: number) => {
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     images: prev.images.filter((_, i) => i !== index),
-  //   }));
-  // };
+  const { attachments } = useProductMediaUpload();
 
   const createProductMutation = useMutation({
     mutationFn: api.product.create,
@@ -99,6 +74,18 @@ export default function CreateProductPage() {
         // TODO: Mungkin Redirect ke halaman products
       }
 
+      if (attachments.length > 0) {
+        const imagesPayload = attachments.map((a, index) => ({
+          product_id: data.id,
+          url: a.url as string,
+          key: a.key as string,
+          alt: a.file.name,
+          sort_order: index,
+        }));
+
+        createProductImagesMutation.mutate(imagesPayload);
+      }
+
       toast.success("Product Created!");
     },
     onError: (error) => {
@@ -110,6 +97,10 @@ export default function CreateProductPage() {
     mutationFn: api.product.createVariant,
   });
 
+  const createProductImagesMutation = useMutation({
+    mutationFn: api.product.createImages,
+  });
+
   const handleSubmit = (data: z.infer<typeof createProductSchema>) => {
     createProductMutation.mutate({
       title: data.title,
@@ -117,6 +108,8 @@ export default function CreateProductPage() {
       sku: data.sku,
       slug: data.slug,
       description: data?.description,
+      status: data.status,
+      category_id: data.category_id,
     });
   };
 
@@ -197,27 +190,17 @@ export default function CreateProductPage() {
                     <FormField
                       control={form.control}
                       name="category_id"
-                      render={({ field, fieldState }) => (
+                      render={() => (
                         <FormItem>
                           <FormLabel className="block text-sm font-medium mb-2">
                             Kategori
                           </FormLabel>
                           <FormControl>
-                            <Select
-                              name={field.name}
-                              value={""}
-                              onValueChange={field.onChange}
-                            >
-                              <SelectTrigger
-                                aria-invalid={fieldState.invalid}
-                                className="w-full"
-                              >
-                                <SelectValue placeholder="Pilih kategori" />
-                              </SelectTrigger>
-                              <SelectContent className="w-full">
-                                <SelectItem value="casual">Casual</SelectItem>
-                              </SelectContent>
-                            </Select>
+                            <CategoryCombobox
+                              onValueChange={(value) => {
+                                form.setValue("category_id", value);
+                              }}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

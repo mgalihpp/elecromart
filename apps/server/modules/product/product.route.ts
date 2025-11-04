@@ -13,6 +13,8 @@ const productVariantsController = new ProductVariantsController();
  *   description: Apparel products (hoodies, t-shirts, etc.)
  */
 
+/* ---------------------- PRODUCTS ---------------------- */
+
 /**
  * @swagger
  * /api/v1/products:
@@ -89,6 +91,30 @@ productRouter.get("/:id", productController.getById);
  */
 productRouter.post("/", productController.create);
 
+/**
+ * @swagger
+ * /api/v1/products/{id}:
+ *   put:
+ *     summary: Update a product
+ *     tags: [Products]
+ *     parameters:
+ *       - $ref: '#/components/parameters/ProductId'
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Product'
+ *     responses:
+ *       200:
+ *         description: Product updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Product'
+ *       404:
+ *         description: Product not found
+ */
 productRouter.put("/:id", productController.update);
 
 /**
@@ -106,6 +132,48 @@ productRouter.put("/:id", productController.update);
  *         description: Product not found
  */
 productRouter.delete("/:id", productController.delete);
+
+/* ---------------------- PRODUCT IMAGES ---------------------- */
+
+/**
+ * @swagger
+ * /api/v1/products/images:
+ *   post:
+ *     summary: Upload product images
+ *     tags: [Products]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               images:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *     responses:
+ *       201:
+ *         description: Images uploaded
+ */
+productRouter.post("/images", productController.createImages);
+
+/**
+ * @swagger
+ * /api/v1/products/images/{imageId}:
+ *   delete:
+ *     summary: Delete a product image
+ *     tags: [Products]
+ *     parameters:
+ *       - $ref: '#/components/parameters/ImageId'
+ *     responses:
+ *       204:
+ *         description: Image deleted successfully
+ */
+productRouter.delete("/images/:imageId", productController.deleteImage);
+
+/* ---------------------- PRODUCT VARIANTS ---------------------- */
 
 /**
  * @swagger
@@ -155,6 +223,18 @@ productRouter.post("/variant", productVariantsController.create);
  */
 productRouter.put("/variant/:variantId", productVariantsController.update);
 
+/**
+ * @swagger
+ * /api/v1/products/variant/{variantId}:
+ *   delete:
+ *     summary: Delete a product variant
+ *     tags: [Products]
+ *     parameters:
+ *       - $ref: '#/components/parameters/VariantId'
+ *     responses:
+ *       204:
+ *         description: Variant deleted successfully
+ */
 productRouter.delete("/variant/:variantId", productVariantsController.delete);
 
 export { productRouter };

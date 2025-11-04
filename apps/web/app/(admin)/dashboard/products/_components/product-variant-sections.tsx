@@ -149,7 +149,7 @@ export function ProductVariantsSection({
   };
 
   const updateVariantStock = (
-    index: number,
+    sku: string,
     field:
       | "stock_quantity"
       | "reserved_quantity"
@@ -157,12 +157,18 @@ export function ProductVariantsSection({
       | "additional_price_cents",
     value: number
   ) => {
-    const newCombinations = [...variantCombinations];
-    const combo = newCombinations[index];
-    if (!combo) return;
-    combo[field] = value;
+    const newCombinations = variantCombinations.map((c) =>
+      c.sku === sku ? { ...c, [field]: value } : c
+    );
     setVariantCombinations(newCombinations);
   };
+
+  const displayedCombinations =
+    filteredCombinations.length > 0
+      ? variantCombinations.filter((c) =>
+          filteredCombinations.some((fc) => fc.sku === c.sku)
+        )
+      : variantCombinations;
 
   return (
     <>
@@ -310,14 +316,10 @@ export function ProductVariantsSection({
           </CardHeader>
           <CardContent>
             <div className="grid md:grid-cols-2 gap-2">
-              {(filteredCombinations.length > 0
-                ? filteredCombinations
-                : variantCombinations
-              ).map((combo, index) => (
+              {displayedCombinations.map((combo, index) => (
                 <StockCard
                   combo={combo}
                   key={index}
-                  index={index}
                   updateVariantStock={updateVariantStock}
                   variantOptions={variantOptions}
                 />
