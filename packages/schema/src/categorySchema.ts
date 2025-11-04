@@ -13,3 +13,6 @@ export const updateCategorySchema = z.object({
   description: z.string().optional(),
   parentId: z.number().optional(),
 });
+
+export type CreateCategoryInput = z.infer<typeof createCategorySchema>;
+export type UpdateCategoryInput = z.infer<typeof updateCategorySchema>;

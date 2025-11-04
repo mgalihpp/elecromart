@@ -10,7 +10,7 @@ function Progress({
   indicatorClassName,
   ...props
 }: React.ComponentProps<typeof ProgressPrimitive.Root> & {
-  indicatorClassName: string;
+  indicatorClassName?: string;
 }) {
   return (
     <ProgressPrimitive.Root

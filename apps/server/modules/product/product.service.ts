@@ -54,11 +54,16 @@ export class ProductService extends BaseService<Product, "product"> {
   async createImages(data: CreateProductImagesInput) {
     return await this.db.productImages.createMany({
       data: data.map((image) => ({
-        product_id: image.product_id,
-        url: image.url,
-        sort_order: image.sort_order,
-        alt: image.alt,
+        ...image,
       })),
+    });
+  }
+
+  async deleteImage(imageId: number) {
+    return await this.db.productImages.delete({
+      where: {
+        id: imageId,
+      },
     });
   }
 }

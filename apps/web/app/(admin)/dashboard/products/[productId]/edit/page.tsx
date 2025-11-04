@@ -32,7 +32,7 @@ import {
 } from "@repo/ui/components/select";
 import { Textarea } from "@repo/ui/components/textarea";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Plus, Save, Trash2, X } from "lucide-react";
+import { Key, Save, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -40,7 +40,9 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type z from "zod";
 import { formatCurrency } from "@/features/admin/utils";
+import { useProductMediaUpload } from "@/features/upload/hooks/useProductMediaUpload";
 import { api } from "@/lib/api";
+import { CategoryCombobox } from "../../_components/category-combobox";
 import { ProductImageUpload } from "../../_components/product-image-upload";
 import { ProductVariantsSection } from "../../_components/product-variant-sections";
 
@@ -48,12 +50,11 @@ export default function EditProductPage() {
   const params = useParams();
   const { productId } = params;
 
-  const [productImages, setProductImages] = useState([]);
-  const [imageInput, setImageInput] = useState("");
   const [variantOptions, setVariantOptions] = useState<VariantOption[]>([]);
   const [variantCombinations, setVariantCombinations] = useState<
     VariantCombination[]
   >([]);
+  const { attachments, setAttachments } = useProductMediaUpload();
 
   const form = useForm<z.infer<typeof updateProductSchema>>({
     resolver: zodResolver(updateProductSchema),
@@ -75,8 +76,6 @@ export default function EditProductPage() {
     queryKey: ["product", productId],
     queryFn: () => api.product.getById(productId as string),
   });
-
-  console.log(variantCombinations);
 
   const updateProductMutation = useMutation({
     mutationFn: ({
@@ -132,6 +131,18 @@ export default function EditProductPage() {
         })
       );
 
+      if (attachments.length > 0) {
+        const imagesPayload = attachments.map((a, index) => ({
+          product_id: data.id,
+          url: a.url as string,
+          key: a.key as string,
+          alt: a.file.name,
+          sort_order: index,
+        }));
+
+        await createProductImagesMutation.mutateAsync(imagesPayload);
+      }
+
       toast.success("Product Updated!");
       refetch();
     },
@@ -154,6 +165,10 @@ export default function EditProductPage() {
     }) => api.product.updateVariant(variantId, data),
   });
 
+  const createProductImagesMutation = useMutation({
+    mutationFn: api.product.createImages,
+  });
+
   const deleteProductVariantMutation = useMutation({
     mutationFn: ({ variantId }: { variantId: string }) =>
       api.product.deleteVariant(variantId),
@@ -168,9 +183,20 @@ export default function EditProductPage() {
         description: productData.description ?? "",
         price_cents: Number(productData.price_cents ?? 0),
         status: productData.status,
+        category_id: productData.category_id ?? undefined,
       });
+
+      setAttachments(
+        productData.product_images.map((i) => ({
+          id: i.id,
+          file: new File([], i.alt ?? "image"),
+          key: i.key,
+          url: i.url,
+          isUploading: false,
+        }))
+      );
     }
-  }, [productData, form]);
+  }, [productData, form, setAttachments]);
 
   useEffect(() => {
     if (productData) {
@@ -290,27 +316,20 @@ export default function EditProductPage() {
                     <FormField
                       control={form.control}
                       name="category_id"
-                      render={({ field, fieldState }) => (
+                      render={() => (
                         <FormItem>
                           <FormLabel className="block text-sm font-medium mb-2">
                             Kategori
                           </FormLabel>
                           <FormControl>
-                            <Select
-                              name={field.name}
-                              value={""}
-                              onValueChange={field.onChange}
-                            >
-                              <SelectTrigger
-                                aria-invalid={fieldState.invalid}
-                                className="w-full"
-                              >
-                                <SelectValue placeholder="Pilih kategori" />
-                              </SelectTrigger>
-                              <SelectContent className="w-full">
-                                <SelectItem value="casual">Casual</SelectItem>
-                              </SelectContent>
-                            </Select>
+                            <CategoryCombobox
+                              defaultValue={form
+                                .getValues("category_id")
+                                ?.toString()}
+                              onValueChange={(value) => {
+                                form.setValue("category_id", value);
+                              }}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -409,7 +428,7 @@ export default function EditProductPage() {
             </div>
 
             {/* Sidebar */}
-            <div className="space-y-6">
+            <div className="space-y-6 sticky top-4 h-screen">
               <Card>
                 <CardHeader>
                   <CardTitle>Status</CardTitle>
@@ -474,15 +493,6 @@ export default function EditProductPage() {
                     <Save />
                     Simpan Perubahan
                   </Button>
-                  <Link href="/dashboard/products" className="block">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full bg-transparent"
-                    >
-                      Cancel
-                    </Button>
-                  </Link>
                   <Button
                     type="button"
                     variant="destructive"
@@ -490,7 +500,7 @@ export default function EditProductPage() {
                     // onClick={() => setShowDeleteConfirm(true)}
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
-                    Delete Product
+                    Hapus Product
                   </Button>
                 </CardContent>
               </Card>

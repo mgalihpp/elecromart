@@ -7,6 +7,10 @@ export const variantIdParams = z.object({
   variantId: z.string().min(1),
 });
 
+export const imageIdParams = z.object({
+  imageId: z.string().min(1),
+});
+
 export const listProductsQuery = z.object({
   category: z.string().optional(),
   q: z.string().optional(),
@@ -67,6 +71,7 @@ export const createProductImagesSchema = z.array(
     url: z.url(),
     alt: z.string().optional(),
     sort_order: z.number(),
+    key: z.string(),
   })
 );
 

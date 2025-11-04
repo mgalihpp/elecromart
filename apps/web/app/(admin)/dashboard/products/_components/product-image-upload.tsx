@@ -14,104 +14,42 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/ui/components/empty";
-import { Image, Image as ImageIcon, Upload, X } from "lucide-react";
-import { useCallback, useState } from "react";
+import { Progress } from "@repo/ui/components/progress";
+import { useDropzone } from "@uploadthing/react";
+import { Image, Upload, X } from "lucide-react";
+import { type ClipboardEvent, useRef } from "react";
 import { toast } from "sonner";
-
-interface UploadedImage {
-  id: string;
-  file: File;
-  preview: string;
-}
+import { useProductMediaUpload } from "@/features/upload/hooks/useProductMediaUpload";
 
 export const ProductImageUpload = () => {
-  const [images, setImages] = useState<UploadedImage[]>([]);
-  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleDrag = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  }, []);
-
-  const handleDragIn = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
-      setIsDragging(true);
-    }
-  }, []);
-
-  const handleDragOut = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-  }, []);
-
-  const validateFile = (file: File): boolean => {
-    const validTypes = [
-      "image/jpeg",
-      "image/jpg",
-      "image/png",
-      "image/webp",
-      "image/gif",
-    ];
-    const maxSize = 5 * 1024 * 1024; // 5MB
-
-    if (!validTypes.includes(file.type)) {
-      toast.error("Format file tidak valid. Gunakan JPG, PNG, WEBP, atau GIF.");
-      return false;
-    }
-
-    if (file.size > maxSize) {
-      toast.error("Ukuran file terlalu besar. Maksimal 5MB.");
-      return false;
-    }
-
-    return true;
+  const handleButtonClick = () => {
+    fileInputRef.current?.click();
   };
 
-  const processFiles = (files: FileList | null) => {
-    if (!files) return;
+  const {
+    attachments,
+    isUploading,
+    removeAttachment,
+    reset,
+    startUpload,
+    uploadProgress,
+  } = useProductMediaUpload();
 
-    const newImages: UploadedImage[] = [];
+  const { getInputProps, getRootProps, isDragActive } = useDropzone({
+    onDrop: startUpload,
+  });
 
-    Array.from(files).forEach((file) => {
-      if (validateFile(file)) {
-        const id = Math.random().toString(36).substring(7);
-        const preview = URL.createObjectURL(file);
-        newImages.push({ id, file, preview });
-      }
-    });
+  const { onClick: _, ...rootProps } = getRootProps();
 
-    if (newImages.length > 0) {
-      setImages((prev) => [...prev, ...newImages]);
-      toast.success(`${newImages.length} gambar berhasil ditambahkan`);
-    }
-  };
+  function onPaste(e: ClipboardEvent<HTMLInputElement>) {
+    const files = Array.from(e.clipboardData.items)
+      .filter((item) => item.kind === "file")
+      .map((item) => item.getAsFile()) as File[];
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-
-    const files = e.dataTransfer.files;
-    processFiles(files);
-  }, []);
-
-  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    processFiles(e.target.files);
-  };
-
-  const removeImage = (id: string) => {
-    setImages((prev) => {
-      const image = prev.find((img) => img.id === id);
-      if (image) {
-        URL.revokeObjectURL(image.preview);
-      }
-      return prev.filter((img) => img.id !== id);
-    });
-    toast.success("Gambar dihapus");
-  };
+    startUpload(files);
+  }
 
   return (
     <Card className="mb-8">
@@ -123,15 +61,13 @@ export const ProductImageUpload = () => {
       </CardHeader>
       <CardContent className="space-y-6">
         <div
+          {...rootProps}
           className={`relative rounded-lg border-2 border-dashed p-8 text-center transition-all duration-300 ease-in-out ${
-            isDragging
+            isDragActive
               ? "border-primary bg-primary/5 shadow-lg scale-[1.02]"
               : "border-muted-foreground/25 hover:border-primary/50 hover:bg-accent"
           }`}
-          onDragEnter={handleDragIn}
-          onDragLeave={handleDragOut}
-          onDragOver={handleDrag}
-          onDrop={handleDrop}
+          onPaste={onPaste}
         >
           <input
             type="file"
@@ -139,7 +75,7 @@ export const ProductImageUpload = () => {
             className="hidden"
             accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
             multiple
-            onChange={handleFileInput}
+            {...getInputProps()}
           />
 
           <label
@@ -178,17 +114,16 @@ export const ProductImageUpload = () => {
           </label>
         </div>
 
-        {images.length > 0 && (
+        {attachments.length > 0 && (
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Gambar Terupload ({images.length})</CardTitle>
+                <CardTitle>Gambar Terupload ({attachments.length})</CardTitle>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => {
-                    images.forEach((img) => URL.revokeObjectURL(img.preview));
-                    setImages([]);
+                    reset();
                     toast.success("Semua gambar dihapus");
                   }}
                 >
@@ -198,27 +133,45 @@ export const ProductImageUpload = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-                {images.map((image) => (
+                {attachments.map((attachment) => (
                   <div
-                    key={image.id}
+                    key={attachment.id ?? attachment.file.name}
                     className="group relative overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all duration-300 hover:shadow-md"
                   >
-                    <div className="aspect-square">
+                    <div className="aspect-square relative">
                       <img
-                        src={image.preview}
-                        alt={image.file.name}
+                        src={
+                          attachment.url
+                            ? attachment.url
+                            : URL.createObjectURL(attachment.file)
+                        }
+                        alt={attachment.file.name}
                         className="h-full w-full object-cover"
                       />
+
+                      {/*  Progress bar overlay */}
+                      {isUploading && attachment.isUploading && (
+                        <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/60">
+                          <Progress
+                            value={uploadProgress ?? 0}
+                            indicatorClassName="bg-green-500"
+                            className="h-2 bg-white"
+                          />
+                          <p className="text-xs text-white mt-1 text-right">
+                            {Math.round(uploadProgress ?? 0)}%
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
                     <div className="absolute bottom-0 left-0 right-0 p-3 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                       <p className="truncate text-sm font-medium">
-                        {image.file.name}
+                        {attachment.file.name}
                       </p>
                       <p className="text-xs text-white/80">
-                        {(image.file.size / 1024).toFixed(1)} KB
+                        {(attachment.file.size / 1024).toFixed(1)} KB
                       </p>
                     </div>
 
@@ -226,7 +179,7 @@ export const ProductImageUpload = () => {
                       variant="destructive"
                       size="icon"
                       className="absolute right-2 top-2 h-8 w-8 opacity-0 shadow-lg transition-opacity duration-300 group-hover:opacity-100"
-                      onClick={() => removeImage(image.id)}
+                      onClick={() => removeAttachment(attachment)}
                     >
                       <X className="h-4 w-4" />
                     </Button>
@@ -237,7 +190,7 @@ export const ProductImageUpload = () => {
           </Card>
         )}
 
-        {images.length === 0 && (
+        {attachments.length === 0 && (
           <Card className="text-center">
             <CardContent className="py-12">
               <Empty className="border border-dashed">
@@ -251,7 +204,12 @@ export const ProductImageUpload = () => {
                   </EmptyDescription>
                 </EmptyHeader>
                 <EmptyContent>
-                  <Button type="button" variant="outline" size="sm">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleButtonClick}
+                  >
                     Unggah Berkas
                   </Button>
                 </EmptyContent>

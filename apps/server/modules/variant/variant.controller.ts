@@ -6,6 +6,7 @@ import {
 } from "@repo/schema/productSchema";
 import type { Request, Response } from "express";
 import z from "zod";
+import { asyncHandler } from "@/middleware/asyncHandler";
 import { AppResponse } from "@/utils/appResponse";
 import { BaseController } from "../controller";
 import { ProductVariantsService } from "./variant.service";
@@ -18,7 +19,7 @@ export class ProductVariantsController extends BaseController<
     super(new ProductVariantsService());
   }
 
-  create = async (req: Request, res: Response) => {
+  create = asyncHandler(async (req: Request, res: Response) => {
     if (Array.isArray(req.body)) {
       const parsed = z.array(createVariantSchema).parse(req.body);
       const newVariants = await this.service.createMany(parsed);
@@ -36,9 +37,9 @@ export class ProductVariantsController extends BaseController<
       res,
       data: newVariant,
     });
-  };
+  });
 
-  update = async (req: Request, res: Response) => {
+  update = asyncHandler(async (req: Request, res: Response) => {
     const parsed = updateVariantSchema.parse(req.body);
     const { variantId } = variantIdParams.parse(req.params);
     const updatedVariant = await this.service.update(variantId, parsed);
@@ -47,9 +48,9 @@ export class ProductVariantsController extends BaseController<
       res,
       data: updatedVariant,
     });
-  };
+  });
 
-  delete = async (req: Request, res: Response) => {
+  delete = asyncHandler(async (req: Request, res: Response) => {
     const { variantId } = variantIdParams.parse(req.params);
     const deletedVariant = await this.service.delete(variantId);
 
@@ -57,5 +58,5 @@ export class ProductVariantsController extends BaseController<
       res,
       data: deletedVariant,
     });
-  };
+  });
 }

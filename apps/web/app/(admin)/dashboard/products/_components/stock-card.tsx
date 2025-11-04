@@ -14,7 +14,7 @@ type StockCardProps = {
   combo: VariantCombination;
   variantOptions: VariantOption[];
   updateVariantStock: (
-    index: number,
+    sku: string,
     field:
       | "additional_price_cents"
       | "stock_quantity"
@@ -22,11 +22,9 @@ type StockCardProps = {
       | "safety_stock",
     value: number
   ) => void;
-  index: number;
 };
 
 export const StockCard = ({
-  index,
   combo,
   variantOptions,
   updateVariantStock,
@@ -103,7 +101,7 @@ export const StockCard = ({
               value={combo.additional_price_cents}
               onChange={(e) =>
                 updateVariantStock(
-                  index,
+                  combo.sku,
                   "additional_price_cents",
                   parseInt(e.target.value) || 0
                 )
@@ -128,7 +126,7 @@ export const StockCard = ({
               value={combo.stock_quantity}
               onChange={(e) =>
                 updateVariantStock(
-                  index,
+                  combo.sku,
                   "stock_quantity",
                   parseInt(e.target.value) || 0
                 )
@@ -147,7 +145,7 @@ export const StockCard = ({
               value={combo.reserved_quantity}
               onChange={(e) =>
                 updateVariantStock(
-                  index,
+                  combo.sku,
                   "reserved_quantity",
                   parseInt(e.target.value) || 0
                 )
@@ -166,7 +164,7 @@ export const StockCard = ({
               value={combo.safety_stock}
               onChange={(e) =>
                 updateVariantStock(
-                  index,
+                  combo.sku,
                   "safety_stock",
                   parseInt(e.target.value) || 0
                 )

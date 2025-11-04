@@ -12,3 +12,11 @@ interface VariantOption {
   name: string;
   values: string[];
 }
+
+interface Attachment {
+  id?: number; // Unique Indentifier dari fetch
+  file: File;
+  key?: string;
+  url?: string;
+  isUploading: boolean;
+}
