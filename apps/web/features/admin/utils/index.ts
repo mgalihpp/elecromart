@@ -1,3 +1,5 @@
+import type { VariantCombination } from "@/types/index";
+
 export const getStockStatus = (combo: VariantCombination) => {
   const { stock_quantity, reserved_quantity, safety_stock } = combo;
 

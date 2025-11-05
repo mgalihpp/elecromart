@@ -1,4 +1,6 @@
-interface VariantCombination {
+import type { Prisma } from "@repo/db";
+
+export interface VariantCombination {
   id?: string; // Ada kalo fetch dari data produk
   sku: string;
   option_values: Record<string, string>;
@@ -8,15 +10,28 @@ interface VariantCombination {
   additional_price_cents: number;
 }
 
-interface VariantOption {
+export interface VariantOption {
   name: string;
   values: string[];
 }
 
-interface Attachment {
+export interface Attachment {
   id?: number; // Unique Indentifier dari fetch
   file: File;
   key?: string;
   url?: string;
   isUploading: boolean;
 }
+
+export type ProductWithRelations = Prisma.ProductGetPayload<{
+  include: {
+    category: true;
+    product_variants: {
+      include: {
+        inventory: true;
+      };
+    };
+    product_images: true;
+    reviews: true;
+  };
+}>;

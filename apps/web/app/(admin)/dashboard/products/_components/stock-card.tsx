@@ -9,6 +9,7 @@ import {
   getStockPercentage,
   getStockStatus,
 } from "@/features/admin/utils";
+import type { VariantCombination, VariantOption } from "@/types/index";
 
 type StockCardProps = {
   combo: VariantCombination;

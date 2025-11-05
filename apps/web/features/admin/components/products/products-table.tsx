@@ -1,6 +1,5 @@
 "use client";
 
-import type { Product } from "@repo/db";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
 import { Card, CardContent, CardHeader } from "@repo/ui/components/card";
@@ -8,16 +7,15 @@ import { useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Edit2, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { ErrorAlert } from "@/features/admin/components//error-alert";
 import { DataTable } from "@/features/admin/components/data-table";
 import { DataTableSkeleton } from "@/features/admin/components/data-table-skeleton";
-import { api } from "@/lib/api";
 import { formatCurrency } from "@/features/admin/utils";
+import { api } from "@/lib/api";
+import type { ProductWithRelations } from "@/types/index";
+import { DeleteProductDialog } from "./delete-product-dialog";
 
 export function ProductsTable() {
-  const router = useRouter();
-
   const {
     data: productsData,
     isPending,
@@ -28,11 +26,7 @@ export function ProductsTable() {
     queryFn: api.product.getAll,
   });
 
-  // const handleDelete = (id: number) => {
-  //   setProducts(products_list.filter((p) => p.id !== id));
-  // };
-
-  const columns: ColumnDef<Product>[] = [
+  const columns: ColumnDef<ProductWithRelations>[] = [
     {
       accessorKey: "title",
       header: "Nama Produk",
@@ -45,10 +39,15 @@ export function ProductsTable() {
       accessorKey: "sku",
       header: "SKU",
     },
-    // {
-    //   accessorKey: "category",
-    //   header: "Category",
-    // },
+    {
+      accessorKey: "category",
+      header: "Category",
+      cell: ({ row }) => {
+        if (!row.original.category) return "-";
+
+        return row.original.category?.name;
+      },
+    },
     {
       accessorKey: "price_cents",
       header: "Harga",
@@ -58,18 +57,29 @@ export function ProductsTable() {
         return <span>{formatCurrency(price_cents)}</span>;
       },
     },
-    // {
-    //   accessorKey: "stock",
-    //   header: "Stock",
-    //   cell: ({ row }) => {
-    //     const stock = row.getValue("stock") as number;
-    //     return (
-    //       <span className={stock === 0 ? "text-destructive font-medium" : ""}>
-    //         {stock}
-    //       </span>
-    //     );
-    //   },
-    // },
+    {
+      accessorKey: "stock",
+      header: "Stock",
+      cell: ({ row }) => {
+        const inventories = row.original.product_variants
+          .map((variant) => variant.inventory?.[0])
+          .filter(Boolean);
+
+        // Menjumlahkan stok
+        const totalStock = inventories.reduce(
+          (sum, inv) => sum + (inv?.stock_quantity ?? 0),
+          0
+        );
+
+        return (
+          <span
+            className={totalStock === 0 ? "text-destructive font-medium" : ""}
+          >
+            {totalStock}
+          </span>
+        );
+      },
+    },
     {
       accessorKey: "status",
       header: "Status",
@@ -94,14 +104,15 @@ export function ProductsTable() {
                 <Edit2 className="w-4 h-4" />
               </Button>
             </Link>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-destructive"
-              // onClick={() => handleDelete(product.id)}
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
+            <DeleteProductDialog productId={row.original.id}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </DeleteProductDialog>
           </div>
         );
       },

@@ -46,7 +46,7 @@ export default function AdminLayout({
             </SidebarProvider>
           </div>
         </ReactQueryProvider>
-        <Toaster position="top-center" />
+        <Toaster position="top-center" richColors />
       </body>
     </html>
   );

@@ -1,4 +1,4 @@
-import type { Prisma, Product } from "@repo/db";
+import type { Product } from "@repo/db";
 import type {
   CreateProductImagesInput,
   CreateProductInput,
@@ -8,18 +8,7 @@ import type {
 } from "@repo/schema/productSchema";
 import axios from "@/lib/axios";
 import type { ApiResponse } from "@/types/api";
-
-type ProductWithRelations = Prisma.ProductGetPayload<{
-  include: {
-    product_variants: {
-      include: {
-        inventory: true;
-      };
-    };
-    product_images: true;
-    reviews: true;
-  };
-}>;
+import type { ProductWithRelations } from "@/types/index";
 
 export const productApi = {
   getAll: async () => {
@@ -66,6 +55,12 @@ export const productApi = {
 
   updateVariant: async (variantId: string, input: UpdateVariantInput) => {
     const res = await axios.put(`/products/variant/${variantId}`, input);
+    const { data } = res.data;
+    return data;
+  },
+
+  delete: async (productId: string) => {
+    const res = await axios.delete(`/products/${productId}`);
     const { data } = res.data;
     return data;
   },

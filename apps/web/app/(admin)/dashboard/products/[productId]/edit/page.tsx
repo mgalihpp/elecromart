@@ -31,17 +31,24 @@ import {
   SelectValue,
 } from "@repo/ui/components/select";
 import { Textarea } from "@repo/ui/components/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@repo/ui/components/tooltip";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Key, Save, Trash2 } from "lucide-react";
-import Link from "next/link";
+import { Save } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type z from "zod";
+import { DeleteProductDialog } from "@/features/admin/components/products/delete-product-dialog";
 import { formatCurrency } from "@/features/admin/utils";
 import { useProductMediaUpload } from "@/features/upload/hooks/useProductMediaUpload";
 import { api } from "@/lib/api";
+import type { VariantCombination, VariantOption } from "@/types/index";
 import { CategoryCombobox } from "../../_components/category-combobox";
 import { ProductImageUpload } from "../../_components/product-image-upload";
 import { ProductVariantsSection } from "../../_components/product-variant-sections";
@@ -54,7 +61,7 @@ export default function EditProductPage() {
   const [variantCombinations, setVariantCombinations] = useState<
     VariantCombination[]
   >([]);
-  const { attachments, setAttachments } = useProductMediaUpload();
+  const { attachments, setAttachments, isUploading } = useProductMediaUpload();
 
   const form = useForm<z.infer<typeof updateProductSchema>>({
     resolver: zodResolver(updateProductSchema),
@@ -131,8 +138,15 @@ export default function EditProductPage() {
         })
       );
 
-      if (attachments.length > 0) {
-        const imagesPayload = attachments.map((a, index) => ({
+      // filter hanya gambar baru (belum ada di database)
+      const newAttachments = attachments.filter((a) => !a.id);
+
+      if (newAttachments.length > 0) {
+        const uniqueAttachments = Array.from(
+          new Map(newAttachments.map((a) => [a.key, a])).values()
+        );
+
+        const imagesPayload = uniqueAttachments.map((a, index) => ({
           product_id: data.id,
           url: a.url as string,
           key: a.key as string,
@@ -147,7 +161,7 @@ export default function EditProductPage() {
       refetch();
     },
     onError: () => {
-      toast.error("Failed to update product");
+      toast.error("Gagal memperbaharui produk");
     },
   });
 
@@ -176,6 +190,9 @@ export default function EditProductPage() {
 
   useEffect(() => {
     if (productData) {
+      // Memastikan untuk tidak double
+      setAttachments([]);
+
       form.reset({
         title: productData.title ?? "",
         sku: productData.sku ?? "",
@@ -256,7 +273,19 @@ export default function EditProductPage() {
               {/* Basic Information */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Informasi Dasar</CardTitle>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild className="w-fit">
+                        <CardTitle className="flex items-center gap-2 cursor-help border-dashed border-b border-foreground">
+                          Informasi Dasar
+                        </CardTitle>
+                      </TooltipTrigger>
+                      <TooltipContent className="w-48">
+                        Berisi data utama produk seperti nama, kategori, dan
+                        deskripsi singkat.
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid lg:grid-cols-2 gap-4">
@@ -362,7 +391,19 @@ export default function EditProductPage() {
               {/* Pricing & Inventory */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Penetapan Harga & Inventaris</CardTitle>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild className="w-fit">
+                        <CardTitle className="flex items-center gap-2 cursor-help border-dashed border-b border-foreground">
+                          Penetapan Harga & Inventaris
+                        </CardTitle>
+                      </TooltipTrigger>
+                      <TooltipContent className="w-56">
+                        Atur harga jual produk dan kelola jumlah stok yang
+                        tersedia di inventaris.
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid lg:grid-cols-2 gap-4">
@@ -407,7 +448,11 @@ export default function EditProductPage() {
                         name="stock"
                         type="number"
                         placeholder="0"
-                        disabled
+                        value={variantCombinations.reduce(
+                          (total, v) => total + (v.stock_quantity ?? 0),
+                          0
+                        )}
+                        readOnly
                       />
                     </FormItem>
                   </div>
@@ -423,7 +468,6 @@ export default function EditProductPage() {
               />
 
               {/* Product Images */}
-
               <ProductImageUpload />
             </div>
 
@@ -487,21 +531,14 @@ export default function EditProductPage() {
                     className="w-full"
                     disabled={
                       updateProductMutation.isPending ||
-                      updateProductVariantsMutation.isPending
+                      updateProductVariantsMutation.isPending ||
+                      isUploading
                     }
                   >
                     <Save />
                     Simpan Perubahan
                   </Button>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    className="w-full"
-                    // onClick={() => setShowDeleteConfirm(true)}
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Hapus Product
-                  </Button>
+                  <DeleteProductDialog productId={productId as string} />
                 </CardContent>
               </Card>
             </div>

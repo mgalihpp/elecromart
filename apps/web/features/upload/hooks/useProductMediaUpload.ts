@@ -4,6 +4,7 @@ import { removeFile } from "@/actions/utApi";
 import { useServerAction } from "@/hooks/useServerAction";
 import { api } from "@/lib/api";
 import { useUploadThing } from "@/lib/uploadthing";
+import type { Attachment } from "@/types/index";
 import { useProductUploadStore } from "../store/useProductUploadStore";
 
 export function useProductMediaUpload() {
@@ -74,6 +75,7 @@ export function useProductMediaUpload() {
     startUpload(files);
   }
 
+  // Funsi ini menghapus salah satuh gambar yang di unggah dan menghapus juga yang di cloud
   function removeAttachment(attachment: Attachment) {
     if (attachment.key) {
       runAction(attachment.key);
@@ -82,6 +84,8 @@ export function useProductMediaUpload() {
     removeAttachmentByName(attachment.file.name);
   }
 
+  // Fungsi ini digunakan ketika gambar sudah di unggah namun ingin hapus semua
+  // maka yang di cloud juga akan dihapus juga
   function reset() {
     const keysToDelete = attachments.filter((a) => a.key).map((a) => a.key!);
 

@@ -15,6 +15,12 @@ import {
   EmptyTitle,
 } from "@repo/ui/components/empty";
 import { Progress } from "@repo/ui/components/progress";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@repo/ui/components/tooltip";
 import { useDropzone } from "@uploadthing/react";
 import { Image, Upload, X } from "lucide-react";
 import { type ClipboardEvent, useRef } from "react";
@@ -54,66 +60,79 @@ export const ProductImageUpload = () => {
   return (
     <Card className="mb-8">
       <CardHeader>
-        <CardTitle>Upload Gambar Produk</CardTitle>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild className="w-fit">
+              <CardTitle className="flex items-center gap-2 cursor-help border-dashed border-b border-foreground">
+                Upload Gambar Produk
+              </CardTitle>
+            </TooltipTrigger>
+            <TooltipContent className="w-56">
+              Unggah gambar produk utama dan tambahan untuk ditampilkan di
+              katalog atau halaman detail. Maksimal hingga 5
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         <CardDescription>
           Unggah gambar produk Anda dengan mudah
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div
-          {...rootProps}
-          className={`relative rounded-lg border-2 border-dashed p-8 text-center transition-all duration-300 ease-in-out ${
-            isDragActive
-              ? "border-primary bg-primary/5 shadow-lg scale-[1.02]"
-              : "border-muted-foreground/25 hover:border-primary/50 hover:bg-accent"
-          }`}
-          onPaste={onPaste}
-        >
-          <input
-            type="file"
-            id="file-upload"
-            className="hidden"
-            accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
-            multiple
-            {...getInputProps()}
-          />
-
-          <label
-            htmlFor="file-upload"
-            className="flex cursor-pointer flex-col items-center justify-center gap-4"
+        {attachments.length < 5 && (
+          <div
+            {...rootProps}
+            className={`relative rounded-lg border-2 border-dashed p-8 text-center transition-all duration-300 ease-in-out ${
+              isDragActive
+                ? "border-primary bg-primary/5 shadow-lg scale-[1.02]"
+                : "border-muted-foreground/25 hover:border-primary/50 hover:bg-accent"
+            }`}
+            onPaste={onPaste}
           >
-            <div className="rounded-full bg-primary/10 p-6 transition-transform duration-300">
-              <Upload className="h-12 w-12 text-primary" />
-            </div>
+            <input
+              type="file"
+              id="file-upload"
+              className="hidden"
+              accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
+              multiple
+              {...getInputProps()}
+            />
 
-            <div className="space-y-2">
-              <p className="text-xl font-semibold text-foreground">
-                Seret & lepas gambar di sini
-              </p>
-              <p className="text-sm text-muted-foreground">
-                atau klik untuk memilih file
-              </p>
-            </div>
-
-            <Button
-              type="button"
-              variant="default"
-              size="lg"
-              className="mt-2"
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById("file-upload")?.click();
-              }}
+            <label
+              htmlFor="file-upload"
+              className="flex cursor-pointer flex-col items-center justify-center gap-4"
             >
-              Pilih Gambar
-            </Button>
+              <div className="rounded-full bg-primary/10 p-6 transition-transform duration-300">
+                <Upload className="h-12 w-12 text-primary" />
+              </div>
 
-            <p className="mt-4 text-xs text-muted-foreground">
-              Format: JPG, PNG, WEBP, GIF • Maksimal: 5MB per file
-            </p>
-          </label>
-        </div>
+              <div className="space-y-2">
+                <p className="text-xl font-semibold text-foreground">
+                  Seret & lepas gambar di sini
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  atau klik untuk memilih file
+                </p>
+              </div>
 
+              <Button
+                type="button"
+                variant="default"
+                size="lg"
+                className="mt-2"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById("file-upload")?.click();
+                }}
+              >
+                Pilih Gambar
+              </Button>
+
+              <p className="mt-4 text-xs text-muted-foreground">
+                Format: JPG, PNG, WEBP, GIF • Maksimal: 5MB per file
+              </p>
+            </label>
+          </div>
+        )}
         {attachments.length > 0 && (
           <Card>
             <CardHeader>
@@ -135,7 +154,7 @@ export const ProductImageUpload = () => {
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
                 {attachments.map((attachment) => (
                   <div
-                    key={attachment.id ?? attachment.file.name}
+                    key={attachment.id ? attachment.id : attachment.file.name}
                     className="group relative overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all duration-300 hover:shadow-md"
                   >
                     <div className="aspect-square relative">

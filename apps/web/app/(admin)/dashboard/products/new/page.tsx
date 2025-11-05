@@ -27,21 +27,30 @@ import {
   SelectValue,
 } from "@repo/ui/components/select";
 import { Textarea } from "@repo/ui/components/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@repo/ui/components/tooltip";
 import { useMutation } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
 import { formatCurrency } from "@/features/admin/utils";
 import { useProductMediaUpload } from "@/features/upload/hooks/useProductMediaUpload";
 import { api } from "@/lib/api";
+import type { VariantCombination, VariantOption } from "@/types/index";
 import { CategoryCombobox } from "../_components/category-combobox";
 import { ProductImageUpload } from "../_components/product-image-upload";
 import { ProductVariantsSection } from "../_components/product-variant-sections";
 
 export default function CreateProductPage() {
+  const router = useRouter();
   const form = useForm<z.infer<typeof createProductSchema>>({
     resolver: zodResolver(createProductSchema),
     defaultValues: {
@@ -58,22 +67,25 @@ export default function CreateProductPage() {
   const [variantCombinations, setVariantCombinations] = useState<
     VariantCombination[]
   >([]);
-  const { attachments } = useProductMediaUpload();
+  const { attachments, setAttachments, isUploading } = useProductMediaUpload();
 
   const createProductMutation = useMutation({
     mutationFn: api.product.create,
     onSuccess: (data) => {
+      // Mapping variant agar ada product_id
       const variantsPayload = variantCombinations.map((v) => ({
         ...v,
         product_id: data.id,
       }));
 
+      /**
+       * Ini akan dijalakan kalo varian yang dibuat lebih dari 0
+       */
       if (variantCombinations.length > 0) {
         createProductVariantsMutation.mutate(variantsPayload);
-      } else {
-        // TODO: Mungkin Redirect ke halaman products
       }
 
+      // Ini akan dijalankan jika gambar yang diunggah lebih dari 0
       if (attachments.length > 0) {
         const imagesPayload = attachments.map((a, index) => ({
           product_id: data.id,
@@ -87,9 +99,13 @@ export default function CreateProductPage() {
       }
 
       toast.success("Product Created!");
+      setAttachments([]);
+
+      // Redirect ke product tabel
+      router.push("/dashboard/products");
     },
-    onError: (error) => {
-      console.error(error);
+    onError: () => {
+      toast.error("Gagal membuat produk");
     },
   });
 
@@ -113,6 +129,10 @@ export default function CreateProductPage() {
     });
   };
 
+  useEffect(() => {
+    setAttachments([]);
+  }, [setAttachments]);
+
   return (
     <div className="p-0 md:p-8 space-y-6">
       <div className="max-md:p-4">
@@ -130,7 +150,19 @@ export default function CreateProductPage() {
               {/* Basic Information */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Informasi Dasar</CardTitle>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild className="w-fit">
+                        <CardTitle className="flex items-center gap-2 cursor-help border-dashed border-b border-foreground">
+                          Informasi Dasar
+                        </CardTitle>
+                      </TooltipTrigger>
+                      <TooltipContent className="w-48">
+                        Berisi data utama produk seperti nama, kategori, dan
+                        deskripsi singkat.
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid lg:grid-cols-2 gap-4">
@@ -233,7 +265,19 @@ export default function CreateProductPage() {
               {/* Pricing & Inventory */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Penetapan Harga & Inventaris</CardTitle>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild className="w-fit">
+                        <CardTitle className="flex items-center gap-2 cursor-help border-dashed border-b border-foreground">
+                          Penetapan Harga & Inventaris
+                        </CardTitle>
+                      </TooltipTrigger>
+                      <TooltipContent className="w-56">
+                        Atur harga jual produk dan kelola jumlah stok yang
+                        tersedia di inventaris.
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid lg:grid-cols-2 gap-4">
@@ -270,19 +314,6 @@ export default function CreateProductPage() {
                         </FormItem>
                       )}
                     />
-                    {/* <div>
-                    <Label className="block text-sm font-medium mb-2">
-                      Cost ($)
-                    </Label>
-                    <Input
-                      name="cost"
-                      type="number"
-                      value={formData.cost}
-                      onChange={handleChange}
-                      placeholder="0"
-                      step="1000"
-                    />
-                  </div> */}
                     <FormItem>
                       <FormLabel className="block text-sm font-medium mb-2">
                         Stock Quantity
@@ -290,10 +321,12 @@ export default function CreateProductPage() {
                       <Input
                         name="stock"
                         type="number"
-                        // value={formData.stock}
-                        // onChange={handleChange}
                         placeholder="0"
-                        disabled
+                        value={variantCombinations.reduce(
+                          (total, v) => total + (v.stock_quantity ?? 0),
+                          0
+                        )}
+                        readOnly
                       />
                     </FormItem>
                   </div>
@@ -313,7 +346,7 @@ export default function CreateProductPage() {
             </div>
 
             {/* Sidebar */}
-            <div className="space-y-6">
+            <div className="space-y-6 sticky top-4 h-screen">
               <Card>
                 <CardHeader>
                   <CardTitle>Status</CardTitle>
@@ -373,7 +406,8 @@ export default function CreateProductPage() {
                     disabled={
                       !form.formState.isDirty ||
                       createProductMutation.isPending ||
-                      createProductVariantsMutation.isPending
+                      createProductVariantsMutation.isPending ||
+                      isUploading
                     }
                   >
                     <Plus />

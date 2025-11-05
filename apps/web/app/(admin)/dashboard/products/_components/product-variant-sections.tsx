@@ -11,6 +11,12 @@ import {
   CardTitle,
 } from "@repo/ui/components/card";
 import { Input } from "@repo/ui/components/input";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@repo/ui/components/tooltip";
 import { Package, Plus, Trash2 } from "lucide-react";
 import {
   type ChangeEvent,
@@ -19,6 +25,7 @@ import {
   useState,
 } from "react";
 import { toast } from "sonner";
+import type { VariantCombination, VariantOption } from "@/types/index";
 import { StockCard } from "./stock-card";
 import { VariantFilter } from "./variant-filter";
 
@@ -174,7 +181,19 @@ export function ProductVariantsSection({
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Opsi Varian Produk</CardTitle>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild className="w-fit">
+                <CardTitle className="flex items-center gap-2 cursor-help border-dashed border-b border-foreground">
+                  Opsi Varian Produk
+                </CardTitle>
+              </TooltipTrigger>
+              <TooltipContent className="w-56">
+                Tambahkan atau atur kombinasi varian produk seperti warna,
+                ukuran, atau tipe.
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <CardDescription>
             Tentukan variasi produk (misal, size, color)
           </CardDescription>
@@ -207,10 +226,11 @@ export function ProductVariantsSection({
                 <Button
                   type="button"
                   variant="ghost"
+                  className="hover:bg-destructive/10"
                   size="sm"
                   onClick={() => removeVariantOption(optionIndex)}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-4 w-4 text-destructive" />
                 </Button>
               </div>
 
