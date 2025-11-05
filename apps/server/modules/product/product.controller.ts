@@ -45,6 +45,7 @@ export class ProductController extends BaseController<Product, ProductService> {
     const products = await this.service.findAll({
       where,
       include: {
+        category: true,
         product_images: true,
         product_variants: {
           include: {
