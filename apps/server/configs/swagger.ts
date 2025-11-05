@@ -77,6 +77,21 @@ const swaggerOptions = {
               description: "Supplier ID",
               example: 1,
             },
+            category: {
+              $ref: "#/components/schemas/Category",
+            },
+            product_images: {
+              type: "array",
+              items: {
+                $ref: "#/components/schemas/ProductImage",
+              },
+            },
+            product_variants: {
+              type: "array",
+              items: {
+                $ref: "#/components/schemas/ProductVariant",
+              },
+            },
             created_at: {
               type: "string",
               format: "date-time",
@@ -143,6 +158,12 @@ const swaggerOptions = {
               format: "int64",
               description: "Additional price for this variant",
               example: 0,
+            },
+            inventory: {
+              type: "array",
+              items: {
+                $ref: "#/components/schemas/Inventory",
+              },
             },
             created_at: {
               type: "string",
@@ -219,6 +240,11 @@ const swaggerOptions = {
               format: "uri",
               description: "Image URL",
               example: "https://example.com/images/hoodie-black-front.jpg",
+            },
+            key: {
+              type: "string",
+              description: "A key used for delete the image",
+              example: "D0ajijkoaff2wafjai299jSIJI",
             },
             alt: {
               type: "string",
