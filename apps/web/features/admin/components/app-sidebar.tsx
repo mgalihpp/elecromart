@@ -62,7 +62,7 @@ const data = {
       items: [
         { title: "All Products", url: "/products" },
         { title: "Add Product", url: "/products/new" },
-        { title: "Variants", url: "/products/variants" },
+        // { title: "Variants", url: "/products/variants" },
         // { title: "Collections", url: "/products/collections" },
         // { title: "Archived", url: "/products/archived" },
       ],
