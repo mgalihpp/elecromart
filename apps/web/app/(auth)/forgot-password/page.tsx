@@ -14,14 +14,14 @@ export default function ForgotPasswordPage() {
 
           {/* Logo/Brand */}
           <div className="relative z-10">
-            <h2 className="text-3xl font-bold text-white mb-2">ElecroMart</h2>
+            <h2 className="text-3xl font-bold text-white mb-2">TryWear</h2>
             <p className="text-amber-100">Account recovery made easy</p>
           </div>
 
           {/* Hero Image */}
           <div className="relative z-10 flex-1 flex items-center justify-center">
             <Image
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/attachments/gen-images/public/security-lock-and-key-illustration-o84EU3SVuMPOFDsdLRci6OhfXK07vr.jpg"
+              src="/image/forget-password.jpg"
               alt="Security illustration"
               width={400}
               height={400}

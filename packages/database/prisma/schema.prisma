@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -21,15 +20,23 @@ datasource db {
  * DO NOT EDIT THIS SECTION MANUALLY.
  */
 model User {
-  id            String    @id
+  id            String          @id
   name          String
   email         String
-  emailVerified Boolean   @default(false)
+  emailVerified Boolean         @default(false)
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @default(now()) @updatedAt
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @default(now()) @updatedAt
   sessions      Session[]
   accounts      Account[]
+  addresses     Addresses[]
+  carts         Carts[]
+  wishlists     Wishlist[]
+  orders        Orders[]
+  reviews       Reviews[]
+  notifications Notifications[]
+  audit_logs    AuditLogs[]
+  returns       Returns[]
 
   role       String?
   banned     Boolean?  @default(false)
@@ -93,3 +100,269 @@ model Verification {
  * ==========================================================
  * DO NOT EDIT THIS SECTION MANUALLY.
  */
+
+model Addresses {
+  id             Int      @id @default(autoincrement())
+  user_id        String
+  recipient_name String   @db.VarChar(50)
+  label          String?  @db.VarChar(50)
+  address_line1  String?  @db.Text
+  address_line2  String?  @db.Text
+  city           String?  @db.VarChar(100)
+  province       String?  @db.VarChar(100)
+  postal_code    String?  @db.VarChar(20)
+  country        String?  @db.VarChar(100)
+  phone          String?  @db.VarChar(50)
+  lat            Float?
+  lng            Float?
+  is_default     Boolean  @default(false)
+  user           User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  orders         Orders[]
+}
+
+model Categories {
+  id          Int          @id @default(autoincrement())
+  parent_id   Int?         @db.Integer
+  name        String       @db.VarChar(150)
+  slug        String       @unique @db.VarChar(180)
+  description String?      @db.Text
+  parent      Categories?  @relation("categoryToParent", fields: [parent_id], references: [id], onDelete: SetNull)
+  children    Categories[] @relation("categoryToParent")
+  products    Product[]
+}
+
+model Suppliers {
+  id            Int       @id @default(autoincrement())
+  name          String    @db.VarChar(200)
+  contact_email String?   @db.VarChar(320)
+  phone         String?   @db.VarChar(50)
+  products      Product[]
+}
+
+model Product {
+  id               String            @id @default(uuid()) @db.Uuid
+  supplier_id      Int?              @db.Integer
+  category_id      Int?              @db.Integer
+  title            String            @db.VarChar(300)
+  slug             String            @unique @db.VarChar(320)
+  sku              String?           @unique @db.VarChar(100)
+  description      String?           @db.Text
+  price_cents      BigInt
+  currency         String            @default("IDR") @db.Char(3)
+  status           String            @default("active") @db.VarChar(30)
+  created_at       DateTime          @default(now()) @db.Timestamptz
+  updated_at       DateTime          @default(now()) @db.Timestamptz
+  supplier         Suppliers?        @relation(fields: [supplier_id], references: [id])
+  category         Categories?       @relation(fields: [category_id], references: [id])
+  product_images   ProductImages[]
+  product_variants ProductVariants[]
+  reviews          Reviews[]
+}
+
+model ProductImages {
+  id         Int     @id @default(autoincrement())
+  product_id String  @db.Uuid
+  url        String  @db.Text
+  alt        String? @db.Text
+  sort_order Int     @default(0)
+  key        String  @db.Text
+  product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+}
+
+model ProductVariants {
+  id                     String          @id @default(uuid()) @db.Uuid
+  product_id             String          @db.Uuid
+  sku                    String?         @unique @db.VarChar(100)
+  option_values          Json?
+  additional_price_cents BigInt          @default(0)
+  created_at             DateTime        @default(now()) @db.Timestamptz
+  product                Product         @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  inventory              Inventory[]
+  cart_items             CartItems[]
+  wishlist_items         WishlistItems[]
+  order_items            OrderItems[]
+}
+
+model Inventory {
+  id                Int             @id @default(autoincrement())
+  variant_id        String          @unique @db.Uuid
+  stock_quantity    Int             @default(0)
+  reserved_quantity Int             @default(0)
+  safety_stock      Int             @default(0)
+  variant           ProductVariants @relation(fields: [variant_id], references: [id], onDelete: Cascade)
+
+  @@index([variant_id])
+}
+
+model Carts {
+  id         String      @id @default(uuid()) @db.Uuid
+  user_id    String
+  created_at DateTime    @default(now()) @db.Timestamptz
+  updated_at DateTime    @default(now()) @db.Timestamptz
+  user       User        @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  cart_items CartItems[]
+}
+
+model CartItems {
+  id         Int             @id @default(autoincrement())
+  cart_id    String          @db.Uuid
+  variant_id String          @db.Uuid
+  quantity   Int
+  added_at   DateTime        @default(now()) @db.Timestamptz
+  cart       Carts           @relation(fields: [cart_id], references: [id], onDelete: Cascade)
+  variant    ProductVariants @relation(fields: [variant_id], references: [id])
+}
+
+model Wishlist {
+  id             String          @id @default(uuid()) @db.Uuid
+  user_id        String
+  name           String          @default("Default") @db.VarChar(150)
+  user           User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  wishlist_items WishlistItems[]
+}
+
+// Wishlist Items
+model WishlistItems {
+  id          Int             @id @default(autoincrement())
+  wishlist_id String          @db.Uuid
+  variant_id  String          @db.Uuid
+  added_at    DateTime        @default(now()) @db.Timestamptz
+  wishlist    Wishlist        @relation(fields: [wishlist_id], references: [id], onDelete: Cascade)
+  variant     ProductVariants @relation(fields: [variant_id], references: [id])
+}
+
+// Orders
+model Orders {
+  id             String       @id @default(uuid()) @db.Uuid
+  user_id        String
+  address_id     Int?         @db.Integer
+  status         String       @default("pending") @db.VarChar(50)
+  subtotal_cents BigInt
+  shipping_cents BigInt       @default(0)
+  tax_cents      BigInt       @default(0)
+  discount_cents BigInt       @default(0)
+  total_cents    BigInt
+  coupon_code    String?      @db.VarChar(100)
+  created_at     DateTime     @default(now()) @db.Timestamptz
+  updated_at     DateTime     @default(now()) @db.Timestamptz
+  user           User?        @relation(fields: [user_id], references: [id])
+  address        Addresses?   @relation(fields: [address_id], references: [id])
+  order_items    OrderItems[]
+  payments       Payments[]
+  shipments      Shipments[]
+  returns        Returns[]
+
+  @@index([user_id])
+}
+
+// Order Items
+model OrderItems {
+  id                Int              @id @default(autoincrement())
+  order_id          String           @db.Uuid
+  variant_id        String?          @db.Uuid
+  sku               String?          @db.VarChar(100)
+  title             String?          @db.VarChar(400)
+  unit_price_cents  BigInt
+  quantity          Int
+  total_price_cents BigInt
+  order             Orders           @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  variant           ProductVariants? @relation(fields: [variant_id], references: [id])
+  return_items      ReturnItems[]
+
+  @@index([order_id])
+}
+
+model Payments {
+  id                  String    @id @default(uuid()) @db.Uuid
+  order_id            String    @db.Uuid
+  provider            String?   @db.VarChar(100)
+  provider_payment_id String?   @db.VarChar(200)
+  status              String?   @db.VarChar(50)
+  amount_cents        BigInt
+  currency            String    @default("IDR") @db.Char(3)
+  paid_at             DateTime? @db.Timestamptz
+  order               Orders    @relation(fields: [order_id], references: [id], onDelete: Cascade)
+}
+
+model Shipment_Method {
+  id           Int         @id @default(autoincrement())
+  name         String?     @db.VarChar(150)
+  carrier_code String?     @db.VarChar(50)
+  shipments    Shipments[]
+}
+
+model Shipments {
+  id                 String           @id @default(uuid()) @db.Uuid
+  order_id           String           @db.Uuid
+  shipment_method_id Int?             @db.Integer
+  tracking_number    String?          @db.VarChar(200)
+  status             String           @default("ready") @db.VarChar(50)
+  shipped_at         DateTime?        @db.Timestamptz
+  delivered_at       DateTime?        @db.Timestamptz
+  order              Orders           @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  shipment_method    Shipment_Method? @relation(fields: [shipment_method_id], references: [id])
+}
+
+model Returns {
+  id           String        @id @default(uuid()) @db.Uuid
+  order_id     String?       @db.Uuid
+  user_id      String?
+  reason       String?       @db.Text
+  status       String        @default("requested") @db.VarChar(50)
+  created_at   DateTime      @default(now()) @db.Timestamptz
+  order        Orders?       @relation(fields: [order_id], references: [id])
+  user         User?         @relation(fields: [user_id], references: [id])
+  return_items ReturnItems[]
+}
+
+// Return Items
+model ReturnItems {
+  id            Int         @id @default(autoincrement())
+  return_id     String      @db.Uuid
+  order_item_id Int?        @db.Integer
+  quantity      Int
+  return        Returns     @relation(fields: [return_id], references: [id], onDelete: Cascade)
+  order_item    OrderItems? @relation(fields: [order_item_id], references: [id])
+}
+
+model Reviews {
+  id         String   @id @default(uuid()) @db.Uuid
+  user_id    String
+  product_id String   @db.Uuid
+  rating     Int      @db.SmallInt
+  title      String?  @db.VarChar(200)
+  body       String?  @db.Text
+  created_at DateTime @default(now()) @db.Timestamptz
+  user       User     @relation(fields: [user_id], references: [id])
+  product    Product  @relation(fields: [product_id], references: [id])
+}
+
+model Coupons {
+  id             String    @id @default(uuid()) @db.Uuid
+  code           String    @unique @db.VarChar(100)
+  discount_type  String?   @db.VarChar(20)
+  discount_value Float?
+  expires_at     DateTime? @db.Timestamptz
+  usage_limit    Int?
+}
+
+model Notifications {
+  id         String   @id @default(uuid()) @db.Uuid
+  user_id    String
+  type       String?  @db.VarChar(100)
+  payload    Json?
+  is_read    Boolean  @default(false)
+  created_at DateTime @default(now()) @db.Timestamptz
+  user       User     @relation(fields: [user_id], references: [id])
+}
+
+model AuditLogs {
+  id          BigInt   @id @default(autoincrement())
+  user_id     String?
+  action      String?  @db.VarChar(200)
+  object_type String?  @db.VarChar(100)
+  object_id   String?  @db.VarChar(200)
+  metadata    Json?
+  created_at  DateTime @default(now()) @db.Timestamptz
+  user        User?    @relation(fields: [user_id], references: [id])
+}

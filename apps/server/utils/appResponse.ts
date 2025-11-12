@@ -3,7 +3,7 @@ import type z from "zod";
 
 export class AppResponse<T = unknown> {
   res: Response;
-  message: string;
+  message?: string;
   success: boolean;
   data?: T;
   error?: unknown;
@@ -22,7 +22,7 @@ export class AppResponse<T = unknown> {
     statusCode = 200,
   }: {
     res: Response;
-    message: string;
+    message?: string;
     success?: boolean;
     data?: T;
     error?: unknown;

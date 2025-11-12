@@ -51,5 +51,8 @@ export const getSessionForMiddleware = async (req: NextRequest) => {
 
   const data = (await res.json()) as Session;
 
-  return data;
+  return {
+    session: data?.session,
+    user: data?.user,
+  };
 };

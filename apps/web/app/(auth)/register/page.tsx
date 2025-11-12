@@ -21,14 +21,14 @@ export default function RegisterPage() {
 
           {/* Logo/Brand */}
           <div className="relative z-10">
-            <h2 className="text-3xl font-bold text-white mb-2">ElecroMart</h2>
+            <h2 className="text-3xl font-bold text-white mb-2">TryWear</h2>
             <p className="text-emerald-100">Join millions of happy shoppers</p>
           </div>
 
           {/* Hero Image */}
           <div className="relative z-10 flex-1 flex items-center justify-center">
             <Image
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/attachments/gen-images/public/happy-customer-shopping-online-ApOyQs4uFGVoCg0URIUcde2fkcX0RE.jpg"
+              src="/image/hero-signup.jpg"
               alt="Happy customer illustration"
               width={400}
               height={400}
@@ -112,7 +112,7 @@ export default function RegisterPage() {
                 Create Account
               </h1>
               <p className="text-muted-foreground">
-                Join ElecroMart and start shopping today
+                Join TryWear and start shopping today
               </p>
             </div>
 

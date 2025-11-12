@@ -1,0 +1,62 @@
+import type { Categories } from "@repo/db";
+import { paramsIdSchema } from "@repo/schema";
+import {
+  createCategorySchema,
+  updateCategorySchema,
+} from "@repo/schema/categorySchema";
+import type { Request, Response } from "express";
+import { asyncHandler } from "@/middleware/asyncHandler";
+import { AppResponse } from "@/utils/appResponse";
+import { BaseController } from "../controller";
+import { CategoriesService } from "./categories.service";
+
+export class CategoriesController extends BaseController<
+  Categories,
+  CategoriesService
+> {
+  constructor() {
+    super(new CategoriesService());
+  }
+
+  getAll = asyncHandler(async (_req: Request, res: Response) => {
+    const cats = await this.service.findAll();
+
+    new AppResponse({
+      res,
+      data: cats,
+    });
+  });
+
+  create = asyncHandler(async (req: Request, res: Response) => {
+    const parsed = createCategorySchema.parse(req.body);
+    const cat = await this.service.create(parsed);
+
+    new AppResponse({
+      res,
+      data: cat,
+    });
+  });
+
+  update = asyncHandler(async (req: Request, res: Response) => {
+    const parsed = updateCategorySchema.parse(req.body);
+    const { id } = paramsIdSchema.parse(req.params);
+
+    const cat = await this.service.update(Number(id), parsed);
+
+    new AppResponse({
+      res,
+      data: cat,
+    });
+  });
+
+  delete = asyncHandler(async (req: Request, res: Response) => {
+    const { id } = paramsIdSchema.parse(req.params);
+
+    await this.service.delete(Number(id));
+
+    new AppResponse({
+      res,
+      message: "Successfully Delete Category",
+    });
+  });
+}
