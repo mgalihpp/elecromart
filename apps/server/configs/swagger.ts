@@ -379,6 +379,13 @@ const swaggerOptions = {
           schema: { type: "string", format: "uuid" },
           description: "Product ID",
         },
+        ProductImageId: {
+          name: "id",
+          in: "path",
+          required: true,
+          schema: { type: "integer" },
+          description: "Product Image ID",
+        },
         CategoryId: {
           name: "id",
           in: "path",

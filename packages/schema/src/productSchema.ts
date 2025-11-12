@@ -12,10 +12,18 @@ export const imageIdParams = z.object({
 });
 
 export const listProductsQuery = z.object({
-  category: z.string().optional(),
-  q: z.string().optional(),
-  page: z.string().optional(),
-  limit: z.string().optional(),
+  categoryId: z.string().optional(),
+  colors: z.array(z.string()).optional(),
+  sizes: z.array(z.string()).optional(),
+  priceRange: z
+    .array(z.coerce.number().int())
+    .optional()
+    .refine((v) => !v || v.length === 2, {
+      message: "priceRange must contain two numeric values: [min, max]",
+    }),
+  query: z.string().optional(),
+  page: z.coerce.number().int().positive().optional(),
+  limit: z.coerce.number().int().positive().optional(),
   sort: z.enum(["newest", "price_asc", "price_desc"]).optional(),
 });
 

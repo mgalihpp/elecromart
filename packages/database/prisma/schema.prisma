@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -103,20 +102,22 @@ model Verification {
  */
 
 model Addresses {
-  id            Int      @id @default(autoincrement())
-  user_id       String
-  label         String?  @db.VarChar(50)
-  address_line1 String?  @db.Text
-  address_line2 String?  @db.Text
-  city          String?  @db.VarChar(100)
-  province      String?  @db.VarChar(100)
-  postal_code   String?  @db.VarChar(20)
-  country       String?  @db.VarChar(100)
-  lat           Float?
-  lng           Float?
-  is_default    Boolean  @default(false)
-  user          User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  orders        Orders[]
+  id             Int      @id @default(autoincrement())
+  user_id        String
+  recipient_name String   @db.VarChar(50)
+  label          String?  @db.VarChar(50)
+  address_line1  String?  @db.Text
+  address_line2  String?  @db.Text
+  city           String?  @db.VarChar(100)
+  province       String?  @db.VarChar(100)
+  postal_code    String?  @db.VarChar(20)
+  country        String?  @db.VarChar(100)
+  phone          String?  @db.VarChar(50)
+  lat            Float?
+  lng            Float?
+  is_default     Boolean  @default(false)
+  user           User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  orders         Orders[]
 }
 
 model Categories {

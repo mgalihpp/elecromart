@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import type { Attachment } from "@/types/index";
 
 interface UploadStore {
   attachments: Attachment[];
@@ -13,7 +14,7 @@ interface UploadStore {
   resetAttachments: () => void;
 }
 
-export const useProductUploadStore = create<UploadStore>((set, get) => ({
+export const useUploadStore = create<UploadStore>((set, get) => ({
   attachments: [],
   uploadProgress: 0,
   isUploading: false,

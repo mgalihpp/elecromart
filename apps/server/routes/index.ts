@@ -1,5 +1,7 @@
 import { Router } from "express";
+import { addressRouter } from "@/modules/address/address.route";
 import { categoriesRouter } from "@/modules/categories/categories.route";
+import { orderRouter } from "@/modules/order/order.route";
 import { productRouter } from "@/modules/product/product.route";
 
 /**
@@ -33,5 +35,19 @@ v1Router.use("/products", productRouter);
  * dikelola di dalam router ini.
  */
 v1Router.use("/categories", categoriesRouter);
+
+/**
+ * Route ini menangani semua endpoint terkait order.
+ * Semua route yang berhubungan dengan data order, managemen order.
+ * dikelola di dalam router ini.
+ */
+v1Router.use("/orders", orderRouter);
+
+/**
+ * Route ini menangani semua endpoint terkait address.
+ * Semua route yang berhubungan dengan data address, managemen address.
+ * dikelola di dalam router ini.
+ */
+v1Router.use("/address", addressRouter);
 
 export default v1Router;

@@ -1,4 +1,4 @@
-import type { Prisma } from "@repo/db";
+import type { Addresses, Prisma } from "@repo/db";
 
 export interface VariantCombination {
   id?: string; // Ada kalo fetch dari data produk
@@ -35,3 +35,47 @@ export type ProductWithRelations = Prisma.ProductGetPayload<{
     reviews: true;
   };
 }>;
+
+export type OrderWithRelations = Prisma.OrdersGetPayload<{
+  include: {
+    order_items: true;
+    user: true;
+  };
+}>;
+
+export type OrderWithFullRelations = Prisma.OrdersGetPayload<{
+  include: {
+    address: true;
+    order_items: {
+      include: {
+        variant: true;
+      };
+    };
+    payments: true;
+    returns: true;
+    shipments: true;
+    user: true;
+  };
+}>;
+
+export type AddressStore = {
+  addresses: Addresses[];
+  setAddresses: (data: Addresses[]) => void;
+  addAddress: (address: Addresses) => void;
+  updateAddress: (id: number, updatedData: Partial<Addresses>) => void;
+  deleteAddress: (id: number) => void;
+  setDefaultAddress: (id: number) => void;
+};
+
+export type SortType = "none" | "newest" | "price-asc" | "price-desc";
+
+export type FilterProps = {
+  sort: SortType;
+  category: number | null;
+  colors: string[];
+  sizes: string[];
+  query: string;
+  price: { isCustom: boolean; range: [number, number] };
+  page: number;
+  pageSize: number;
+};

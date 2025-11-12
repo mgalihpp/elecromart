@@ -5,8 +5,8 @@ import { getBaseUrl } from "@repo/ui/lib/utils";
 type SendEmailParams = {
   to: string;
   subject: string;
-  text: string;
-  type: "reset-password" | "verify-email";
+  text?: string;
+  type: "reset-password" | "verify-email" | "password-changed";
 };
 
 export const sendEmail = async ({
